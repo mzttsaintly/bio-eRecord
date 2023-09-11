@@ -1,6 +1,9 @@
 # bio-eRecord
 
 新的快速填写实验记录的工具！以[e-from 1.0](https://github.com/mzttsaintly/e-form)为基础进行重构。
+前端采用vue3 + element plus
+后端采用fastapi
+python 版本 > 3.10
 
 ## Recommended IDE Setup
 
