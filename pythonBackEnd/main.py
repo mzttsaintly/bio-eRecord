@@ -12,6 +12,8 @@ from loguru import logger
 
 from sql_app import secret_key
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # to get a string like this run: 使用下面的命令获取一个随机的密钥
 # openssl rand -hex 32
 ALGORITHM = "HS256"
@@ -24,6 +26,16 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+# 跨域
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Dependency
@@ -91,6 +103,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 @app.get("/user/me/", response_model=schemas.UserBase)
 async def read_user_me(current_user: schemas.UserBase = Depends(get_current_user)):
     return current_user
+
+
+# 需要登录验证的在形参中加入下面一行内容
+# current_user: schemas.UserBase = Depends(get_current_user)
 
 
 @app.post("/user/create_user")

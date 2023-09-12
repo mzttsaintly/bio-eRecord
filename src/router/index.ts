@@ -1,23 +1,51 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import { useLoginStore } from '../stores/counter';
+import loginVue from '../views/logIn.vue';
+import userInfoVue from '../views/userInfo.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: '',
+      redirect: '/login',
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      path: '/login',
+      name: 'login',
+      component: loginVue,
+    },
+    {
+      path: '/userInfo',
+      name: 'userInfo',
+      component: userInfoVue,
     }
+    // {
+    //   path: '/about',
+    //   name: 'about',
+    //   // route level code-splitting
+    //   // this generates a separate chunk (About.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () => import('../views/AboutView.vue')
+    // }
   ]
+})
+
+
+router.beforeEach((to) => {
+  const isLogin = useLoginStore().notarizeLogin()
+  if (to.path === '/login') {
+    if (isLogin) {
+      return {path: '/userInfo'}
+    }
+  }
+  if (to.path === '/userInfo') {
+    if (isLogin === false) {
+      return {path: '/login'}
+    }
+  }
 })
 
 export default router

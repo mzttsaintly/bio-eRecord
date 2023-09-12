@@ -1,85 +1,52 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from 'vue';
+import { RouterView, useRouter } from 'vue-router';
+import { useSideBarStore } from './stores/counter';
+import headVue from './views/headVue.vue'
+
+// 路由
+const router = useRouter()
+
+// 侧边栏状态
+const sideBarState = useSideBarStore().sideBarState
+
+// 获取当前屏幕宽度
+const getWindowWidth = () => {
+  return window.innerWidth
+}
+
+// 根据屏幕宽度修改侧边栏占据屏幕的百分比
+const autoChangePercent = () => {
+  let currentWindowWidth = getWindowWidth()
+  if (currentWindowWidth <= 768) {
+    useSideBarStore().changeSideBarWidth('50%')
+  }
+
+}
+
+onMounted(() => {
+  autoChangePercent()
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <el-row>
+    <el-col :span="24">
+      <headVue></headVue>
+    </el-col>
+    <el-col :span="24">
+      <RouterView></RouterView>
+    </el-col>
+  </el-row>
+  <!-- 弹出式侧边栏 -->
+  <nut-popup class="sideBar" position="left" v-model:visible="sideBarState.show"
+    :style="{ width: sideBarState.width, height: sideBarState.height }">
+    <nut-side-navbar offset="30">
+      <nut-side-navbar-item ikey="1" title="项目列表" @click="router.push({ path: '/' })"></nut-side-navbar-item>
+      <nut-side-navbar-item ikey="2" title="物料管理" @click="router.push({ path: '/' })"></nut-side-navbar-item>
+      <nut-side-navbar-item ikey="3" title="设备管理" @click="router.push({ path: '/' })"></nut-side-navbar-item>
+    </nut-side-navbar>
+  </nut-popup>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
+<style scoped></style>

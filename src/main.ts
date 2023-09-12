@@ -1,4 +1,6 @@
-import './assets/main.css'
+import './assets/reset.css';
+import "@nutui/nutui/dist/style.css";
+// import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
