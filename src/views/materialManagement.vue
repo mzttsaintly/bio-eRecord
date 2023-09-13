@@ -68,6 +68,7 @@ import type { Ref } from 'vue';
 
 import { useLoginStore } from '../stores/counter';
 import { ElMessageBox } from 'element-plus';
+import type internal from 'node:stream';
 
 // 从服务器获得token
 const tokenStore = useLoginStore()
@@ -75,9 +76,9 @@ const tokenStore = useLoginStore()
 const gotHeaders = tokenStore.get_headers()
 
 interface Material {
-    material_name: Ref<string>;
-    material_lot: Ref<string>;
-    material_EOV: Ref<string>;
+    material_name: string;
+    material_lot: string;
+    material_EOV: string;
 }
 
 const addMaterial: Material[] = reactive([{
@@ -88,9 +89,9 @@ const addMaterial: Material[] = reactive([{
 
 const addM = () => {
     addMaterial.push({
-        material_name: ref(''),
-        material_lot: ref(''),
-        material_EOV: ref('')
+        material_name: ref('').value,
+        material_lot: ref('').value,
+        material_EOV: ref('').value
     })
 }
 
@@ -116,17 +117,17 @@ const pushMaterial = () => {
 const materialTabsStates = ref(0)
 
 // 获取物料列表链接
-const getMaterialUrl = baseUrl['baseUrl'] + 'queryMaterial'
+const getMaterialUrl = baseUrl['baseUrl'] + 'material/get_all'
 
 // 临时存储从服务器获取的数据
-const severData = reactive([])
+const severData: object[] = reactive([])
 
 // 从服务器获取数据
 const getSeverData = async () => {
-    await axios.post(getMaterialUrl).then(
+    await axios.get(getMaterialUrl).then(
         (response) => {
             severData.length = 0;
-            response.data.forEach((item) => {
+            response.data.forEach((item: object) => {
                 severData.push(item)
             })
             // severData = response.data;
@@ -144,7 +145,7 @@ const getSeverData = async () => {
 const del_url = baseUrl['baseUrl'] + 'use_del_material'
 
 // 删除前确认
-const verifyDelMaterial = async (id) => {
+const verifyDelMaterial = async (id: number) => {
     ElMessageBox.confirm('确定删除该条目？', '删除确认', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -156,7 +157,7 @@ const verifyDelMaterial = async (id) => {
     )
 }
 
-const delMaterial = async (id) => {
+const delMaterial = async (id: number) => {
     await axios.post(del_url, { 'id': id }, gotHeaders).then(
         (response) => {
             ElMessage(response.data)
@@ -174,6 +175,8 @@ onMounted(async () => {
 
 // 需编辑的行所在的index
 const editIndex = ref(-1)
+
+
 
 // 设置将要编辑的行index
 const handleEdit = async (row) => {
