@@ -192,7 +192,7 @@ async def update_material(new_material: schemas.MaterialBase, db: Session = Depe
     logger.debug('用户名为' + str(current_user.user_name))
     logger.debug('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
-        res = crud.update_material(db, material_id=new_material.material_id, material_name=new_material.material_name,
+        res = crud.update_material(db, material_id=new_material.id, material_name=new_material.material_name,
                                    material_lot=new_material.material_lot, material_EOV=new_material.material_EOV)
         return res
     else:
@@ -205,7 +205,7 @@ async def update_material(new_equipments: schemas.EquipmentsBase, db: Session = 
     logger.debug('用户名为' + str(current_user.user_name))
     logger.debug('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
-        res = crud.update_equipments(db, equipments_id=new_equipments.equipments_id, equipName=new_equipments.equipName,
+        res = crud.update_equipments(db, equipments_id=new_equipments.id, equipName=new_equipments.equipName,
                                      equipNum=new_equipments.equipNum, place=new_equipments.place)
         return res
     else:

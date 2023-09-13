@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useLoginStore } from '../stores/counter';
+
 import loginVue from '../views/logIn.vue';
-import userInfoVue from '../views/userInfo.vue'
+import userInfoVue from '../views/userInfo.vue';
+import materialManagementVue from '@/views/materialManagement.vue';
 
 
 const router = createRouter({
@@ -21,7 +23,13 @@ const router = createRouter({
       path: '/userInfo',
       name: 'userInfo',
       component: userInfoVue,
+    },
+    {
+      path: '/materialManagement',
+      name: 'materialManagement',
+      component: materialManagementVue
     }
+
     // {
     //   path: '/about',
     //   name: 'about',
@@ -38,12 +46,12 @@ router.beforeEach((to) => {
   const isLogin = useLoginStore().notarizeLogin()
   if (to.path === '/login') {
     if (isLogin) {
-      return {path: '/userInfo'}
+      return { path: '/userInfo' }
     }
   }
   if (to.path === '/userInfo') {
     if (isLogin === false) {
-      return {path: '/login'}
+      return { path: '/login' }
     }
   }
 })

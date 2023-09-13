@@ -64,11 +64,10 @@
 import { ref, reactive, onMounted } from 'vue';
 import axios from 'axios';
 import baseUrl from '../assets/apilink.json'
-import type { Ref } from 'vue';
 
 import { useLoginStore } from '../stores/counter';
 import { ElMessageBox } from 'element-plus';
-import type internal from 'node:stream';
+import type {  AxiosError, AxiosResponse } from 'axios';
 
 // 从服务器获得token
 const tokenStore = useLoginStore()
@@ -100,13 +99,13 @@ const addMaterialUrl = baseUrl['baseUrl'] + 'add_Material'
 
 const pushMaterial = () => {
     axios.post(addMaterialUrl, addMaterial, gotHeaders).then(
-        function (response) {
+        (response: AxiosResponse) => {
             ElMessageBox.alert(response.data, '提交结果', {
                 confirmButtonText: 'OK',
             })
         }
-    ).catch(function (err) {
-        ElMessageBox.alert(err, '服务器错误', {
+    ).catch((err: AxiosError) => {
+        ElMessageBox.alert(err.message, '服务器错误', {
             confirmButtonText: 'OK',
         })
         console.log(err)
@@ -125,7 +124,7 @@ const severData: object[] = reactive([])
 // 从服务器获取数据
 const getSeverData = async () => {
     await axios.get(getMaterialUrl).then(
-        (response) => {
+        (response: AxiosResponse) => {
             severData.length = 0;
             response.data.forEach((item: object) => {
                 severData.push(item)
@@ -133,8 +132,8 @@ const getSeverData = async () => {
             // severData = response.data;
             console.log(severData)
         }
-    ).catch((err) => {
-        ElMessageBox.alert(err, '服务器错误', {
+    ).catch((err: AxiosError) => {
+        ElMessageBox.alert(err.message, '服务器错误', {
             confirmButtonText: 'OK',
         })
         console.log(err)
@@ -159,12 +158,12 @@ const verifyDelMaterial = async (id: number) => {
 
 const delMaterial = async (id: number) => {
     await axios.post(del_url, { 'id': id }, gotHeaders).then(
-        (response) => {
+        (response: AxiosResponse) => {
             ElMessage(response.data)
         }
-    ).catch((err) => {
+    ).catch((err: AxiosError) => {
         console.log(err)
-        ElMessage(err)
+        ElMessage(err.message)
     })
     await getSeverData()
 }
@@ -176,15 +175,21 @@ onMounted(async () => {
 // 需编辑的行所在的index
 const editIndex = ref(-1)
 
-
+// 声明row的格式
+interface rowInfo {
+    id: number;
+    material_name: string;
+    material_lot: string;
+    material_EOV: string
+}
 
 // 设置将要编辑的行index
-const handleEdit = async (row) => {
+const handleEdit = async (row: rowInfo) => {
     if (editIndex.value !== row.id) {
         editIndex.value = row.id
     } else {
-        let tempInfo = {
-            material_id: row.id,
+        let tempInfo: rowInfo = {
+            id: row.id,
             material_name: row.material_name,
             material_lot: row.material_lot,
             material_EOV: row.material_EOV
@@ -209,12 +214,17 @@ const handleEdit = async (row) => {
 // 修改条目
 const modifyUrl = baseUrl['baseUrl'] + 'modify_material'
 
-const modifyMaterial = async (modifyInfo) => {
-    await axios.post(modifyUrl, modifyInfo, gotHeaders).then((response) => {
+const modifyMaterial = async (modifyInfo: rowInfo) => {
+    await axios.post(modifyUrl, modifyInfo, gotHeaders).then((response: AxiosResponse) => {
         ElMessage(response.data)
-    }).catch((err) => {
-        console.log(err)
-        ElMessage(err)
+    }).catch((err: AxiosError) => {
+        console.log(err.message)
+        ElMessage(err.message)
     })
+}
+
+// 名称筛选
+const filterName = (value: string, row: rowInfo) => {
+    return row.material_name === value
 }
 </script>
