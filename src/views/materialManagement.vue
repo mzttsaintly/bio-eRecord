@@ -77,6 +77,7 @@ const tokenStore = useLoginStore()
 // 生成的请求头
 const gotHeaders = tokenStore.get_headers()
 
+// 声明物料信息类型
 interface Material {
     material_name: string;
     material_lot: string;
@@ -106,6 +107,7 @@ const pushMaterial = () => {
             ElMessageBox.alert(response.data, '提交结果', {
                 confirmButtonText: 'OK',
             })
+            getSeverData()
         }
     ).catch((err: AxiosError) => {
         ElMessageBox.alert(err.message, '服务器错误', {

@@ -163,12 +163,12 @@ async def del_material(del_id: schemas.delBae, db: Session = Depends(get_db),
 
 
 @app.post("/equipments/del")
-async def del_equipments(del_id: int, db: Session = Depends(get_db),
+async def del_equipments(del_id: schemas.delBae, db: Session = Depends(get_db),
                          current_user: schemas.UserBase = Depends(get_current_user)):
     logger.info('用户名为' + str(current_user.user_name))
     logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
-        res = crud.del_equipments(db, del_id)
+        res = crud.del_equipments(db, del_id.del_id)
         return "删除" + str(res) + "条成功"
     else:
         return "权限不足"

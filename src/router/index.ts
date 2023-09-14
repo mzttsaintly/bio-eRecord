@@ -4,6 +4,7 @@ import { useLoginStore } from '../stores/counter';
 import loginVue from '../views/logIn.vue';
 import userInfoVue from '../views/userInfo.vue';
 import materialManagementVue from '@/views/materialManagement.vue';
+import equipmentManagementVue from '@/views/equipmentManagement.vue';
 
 
 const router = createRouter({
@@ -28,6 +29,11 @@ const router = createRouter({
       path: '/materialManagement',
       name: 'materialManagement',
       component: materialManagementVue
+    },
+    {
+      path: '/equipmentManagement',
+      name: 'equipmentManagement',
+      component: equipmentManagementVue
     }
 
     // {
