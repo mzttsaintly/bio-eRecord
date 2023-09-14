@@ -5,6 +5,8 @@ import loginVue from '../views/logIn.vue';
 import userInfoVue from '../views/userInfo.vue';
 import materialManagementVue from '@/views/materialManagement.vue';
 import equipmentManagementVue from '@/views/equipmentManagement.vue';
+import projectShowVue from '@/views/projectShow.vue';
+import projetWriteVue from '@/views/projectWrite.vue'
 
 
 const router = createRouter({
@@ -34,7 +36,17 @@ const router = createRouter({
       path: '/equipmentManagement',
       name: 'equipmentManagement',
       component: equipmentManagementVue
-    }
+    },
+    {
+      path: '/projectShow',
+      name: 'projectShow',
+      component: projectShowVue
+    },
+    {
+      path: '/projetWrite',
+      name: 'projetWrite',
+      component: projetWriteVue
+    },
 
     // {
     //   path: '/about',

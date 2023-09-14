@@ -42,9 +42,10 @@ onMounted(() => {
   <nut-popup class="sideBar" position="left" v-model:visible="sideBarState.show"
     :style="{ width: sideBarState.width, height: sideBarState.height }">
     <nut-side-navbar offset="30">
-      <nut-side-navbar-item class="navItem" ikey="1" title="项目列表" @click="router.push({ path: '/' })"></nut-side-navbar-item>
+      <nut-side-navbar-item class="navItem" ikey="1" title="项目列表" @click="router.push({ path: '/projectShow' })"></nut-side-navbar-item>
       <nut-side-navbar-item class="navItem" ikey="2" title="物料管理" @click="router.push({ path: '/materialManagement' })"></nut-side-navbar-item>
       <nut-side-navbar-item class="navItem" ikey="3" title="设备管理" @click="router.push({ path: '/equipmentManagement' })"></nut-side-navbar-item>
+      <nut-side-navbar-item class="navItem" ikey="3" title="测试组件" @click="router.push({ path: '/projetWrite' })"></nut-side-navbar-item>
     </nut-side-navbar>
   </nut-popup>
 </template>
