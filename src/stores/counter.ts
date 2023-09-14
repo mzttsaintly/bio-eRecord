@@ -46,17 +46,27 @@ export const useLoginStore = defineStore('login', () => {
   }
   function get_headers() {
     const temp_headers: tokenHeader = {
-      headers:{
+      headers: {
         'authorization': userToken.value
-    }
+      }
     }
     return temp_headers
   }
+function get_form_headers() {
+  const temp_form_headers: tokenHeader = {
+    headers: {
+      'authorization': userToken.value,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  }
+  return temp_form_headers
+}
+
   function notarizeLogin() {
     return userToken.value !== ''
   }
-  
-  return { userToken, changeToken, logout, get_headers, notarizeLogin }
+
+  return { userToken, changeToken, logout, get_headers, get_form_headers, notarizeLogin }
 })
 
 // 保存用户登录信息

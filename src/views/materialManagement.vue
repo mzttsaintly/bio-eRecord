@@ -1,10 +1,11 @@
 <template>
     <nut-tabs v-model="materialTabsStates">
         <nut-tab-pane title="物料信息查询">
-            <el-scrollbar :height="'100vw'">
+            <el-scrollbar :height="'80vh'">
                 <el-table :data="severData">
                     <el-table-column prop="id" label="ID" sortable></el-table-column>
-                    <el-table-column prop="material_name" label="物料名称" sortable>
+                    <el-table-column prop="material_name" label="物料名称" sortable :filters="filtersName"
+                        :filter-method="filterNameMethod">
                         <template v-slot="editRow">
                             <span v-show="editRow.row.id !== editIndex">{{ editRow.row.material_name }}</span>
                             <el-input v-show="editRow.row.id === editIndex" v-model="editRow.row.material_name"></el-input>
@@ -46,16 +47,18 @@
         </nut-tab-pane>
 
         <nut-tab-pane title="物料信息录入">
-            <el-form :model="addMaterial">
-                <el-form-item v-for="(item, index) in addMaterial" :key="index">
-                    <el-tag>{{ index + 1 }}</el-tag>
-                    <el-input v-model="item.material_name"><template #prepend>物料名称</template></el-input>
-                    <el-input v-model="item.material_lot"><template #prepend>物料批号</template></el-input>
-                    <el-input v-model="item.material_EOV"><template #prepend>有效期/复验期</template></el-input>
-                </el-form-item>
-                <el-button type="primary" @click="addM">+</el-button>
-            </el-form>
             <el-button @click="pushMaterial" type="info">提交</el-button>
+            <el-scrollbar :height="'60vh'">
+                <el-form :model="addMaterial">
+                    <el-form-item v-for="(item, index) in addMaterial" :key="index">
+                        <el-tag>{{ index + 1 }}</el-tag>
+                        <el-input v-model="item.material_name"><template #prepend>物料名称</template></el-input>
+                        <el-input v-model="item.material_lot"><template #prepend>物料批号</template></el-input>
+                        <el-input v-model="item.material_EOV"><template #prepend>有效期/复验期</template></el-input>
+                    </el-form-item>
+                </el-form>
+            </el-scrollbar>
+            <el-button type="primary" @click="addM">+</el-button>
         </nut-tab-pane>
     </nut-tabs>
 </template>
@@ -67,7 +70,7 @@ import baseUrl from '../assets/apilink.json'
 
 import { useLoginStore } from '../stores/counter';
 import { ElMessageBox } from 'element-plus';
-import type {  AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 
 // 从服务器获得token
 const tokenStore = useLoginStore()
@@ -95,7 +98,7 @@ const addM = () => {
 }
 
 // 提交数据
-const addMaterialUrl = baseUrl['baseUrl'] + 'add_Material'
+const addMaterialUrl = baseUrl['baseUrl'] + 'material/add'
 
 const pushMaterial = () => {
     axios.post(addMaterialUrl, addMaterial, gotHeaders).then(
@@ -119,18 +122,18 @@ const materialTabsStates = ref(0)
 const getMaterialUrl = baseUrl['baseUrl'] + 'material/get_all'
 
 // 临时存储从服务器获取的数据
-const severData: object[] = reactive([])
+const severData: rowInfo[] = reactive([])
 
 // 从服务器获取数据
 const getSeverData = async () => {
     await axios.get(getMaterialUrl).then(
         (response: AxiosResponse) => {
             severData.length = 0;
-            response.data.forEach((item: object) => {
+            response.data.forEach((item: rowInfo) => {
                 severData.push(item)
             })
             // severData = response.data;
-            console.log(severData)
+            // console.log(severData)
         }
     ).catch((err: AxiosError) => {
         ElMessageBox.alert(err.message, '服务器错误', {
@@ -141,7 +144,7 @@ const getSeverData = async () => {
 }
 
 // 删除条目
-const del_url = baseUrl['baseUrl'] + 'use_del_material'
+const del_url = baseUrl['baseUrl'] + 'material/del'
 
 // 删除前确认
 const verifyDelMaterial = async (id: number) => {
@@ -157,7 +160,7 @@ const verifyDelMaterial = async (id: number) => {
 }
 
 const delMaterial = async (id: number) => {
-    await axios.post(del_url, { 'id': id }, gotHeaders).then(
+    await axios.post(del_url, { 'del_id': id }, gotHeaders).then(
         (response: AxiosResponse) => {
             ElMessage(response.data)
         }
@@ -170,6 +173,7 @@ const delMaterial = async (id: number) => {
 
 onMounted(async () => {
     await getSeverData()
+    getFiltersName()
 })
 
 // 需编辑的行所在的index
@@ -206,13 +210,13 @@ const handleEdit = async (row: rowInfo) => {
             await getSeverData()
         })
         editIndex.value = -1
-        
+
     }
 
 }
 
 // 修改条目
-const modifyUrl = baseUrl['baseUrl'] + 'modify_material'
+const modifyUrl = baseUrl['baseUrl'] + 'material/update'
 
 const modifyMaterial = async (modifyInfo: rowInfo) => {
     await axios.post(modifyUrl, modifyInfo, gotHeaders).then((response: AxiosResponse) => {
@@ -223,8 +227,26 @@ const modifyMaterial = async (modifyInfo: rowInfo) => {
     })
 }
 
-// 名称筛选
-const filterName = (value: string, row: rowInfo) => {
+// 名称筛选方法
+const filterNameMethod = (value: string, row: rowInfo) => {
     return row.material_name === value
+}
+
+// 获取名称排序filters数组
+const filtersName: object[] = reactive([])
+
+const getFiltersName = () => {
+    const uniquerFilrersName = new Map()
+
+    severData.forEach((item: rowInfo) => {
+        uniquerFilrersName.set(item.material_name, 1)
+    })
+
+    uniquerFilrersName.forEach((value, key) => {
+        filtersName.push({
+            text: key,
+            value: key
+        })
+    })
 }
 </script>

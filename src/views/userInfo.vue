@@ -23,6 +23,9 @@
         <template #prepend>密码：</template>
     </el-input>
 
+    <el-text>
+        设置新用户权限：
+    </el-text>
     <el-checkbox-group v-model="new_authority">
         <el-checkbox :label="1">写记录</el-checkbox>
         <el-checkbox :label="2">修改物料、设备信息</el-checkbox>
@@ -30,9 +33,9 @@
     </el-checkbox-group>
 
     <nut-button type="success" @click="create_user">创建新用户</nut-button>
-
+<!-- 
     {{ new_authority }}
-    {{ newUser.authority }}
+    {{ newUser.authority }} -->
 </template>
 
 <script setup lang="ts">
@@ -87,8 +90,11 @@ const newUser = reactive({
 
 const create_user_url = baseUrl['baseUrl'] + 'user/create_user'
 
+const formHeader = tokenStore.get_form_headers()
+
 const create_user = () => {
-    axios.post(create_user_url, newUser, gotHeaders).then(
+    console.log(newUser)
+    axios.post(create_user_url, newUser, formHeader).then(
         (response) => {
             ElMessageBox.alert(response.data, '创建结果', {
             confirmButtonText: 'OK',

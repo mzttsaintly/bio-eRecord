@@ -1,5 +1,5 @@
 <template>
-    <nut-cell>
+    <nut-cell class="loginWindow">
         <el-form ref="userFormRef" :model="userForm">
             <el-form-item label="用户名：" prop="username">
                 <el-input v-model="userForm.username" clearable @keyup.enter="() => passwordInput.focus()"></el-input>
@@ -71,3 +71,9 @@ const login = () => {
     })
 }
 </script>
+
+<style scoped>
+.loginWindow {
+    justify-content: center;
+}
+</style>

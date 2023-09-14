@@ -1,16 +1,16 @@
 from pydantic import BaseModel
-from typing import Union
+from typing import Union, List
 
 
 class MaterialBase(BaseModel):
-    material_id: int | None = None
+    id: int | None = None
     material_name: str
     material_lot: str
     material_EOV: str
 
 
 class EquipmentsBase(BaseModel):
-    equipments_id: int | None = None
+    id: int | None = None
     equipName: str
     equipNum: str
     place: str
@@ -28,3 +28,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Union[str, None] = None
+
+
+class delBae(BaseModel):
+    del_id: int

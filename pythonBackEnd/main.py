@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException, Form, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sql_app import crud, models, schemas
+from typing import List
 from sql_app.database import SessionLocal, engine
 
 from datetime import datetime, timedelta
@@ -19,7 +20,6 @@ from fastapi.middleware.cors import CORSMiddleware
 ALGORITHM = "HS256"
 SECRET_KEY = secret_key.secret_key
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -110,53 +110,53 @@ async def read_user_me(current_user: schemas.UserBase = Depends(get_current_user
 
 
 @app.post("/user/create_user")
-async def create_user(username: str = Form(), password: str = Form(), db: Session = Depends(get_db),
+async def create_user(username: str = Form(), password: str = Form(), authority: int = Form(),
+                      db: Session = Depends(get_db),
                       current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 4:
-        res = crud.create_user(db, user_name=username, password=password, authority=7)
+        res = crud.create_user(db, user_name=username, password=password, authority=authority)
         return res
     else:
         return "权限不足"
 
 
-# 以下为业务代码
-
-
 @app.post("/material/add")
-async def add_material(new_material: schemas.MaterialBase, db: Session = Depends(get_db),
+async def add_material(new_material: List[schemas.MaterialBase], db: Session = Depends(get_db),
                        current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
-        res = crud.add_material(db, material_name=new_material.material_name, material_lot=new_material.material_lot,
-                                material_EOV=new_material.material_EOV)
-        return res
+        for item in new_material:
+            res = crud.add_material(db, material_name=item.material_name, material_lot=item.material_lot,
+                                    material_EOV=item.material_EOV)
+            return res
     else:
         return "权限不足"
 
 
 @app.post("/equipments/add")
-async def add_equipments(new_equipments: schemas.EquipmentsBase, db: Session = Depends(get_db),
+async def add_equipments(new_equipments: List[schemas.EquipmentsBase], db: Session = Depends(get_db),
                          current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
-        res = crud.add_equipments(db, equipName=new_equipments.equipName, equipNum=new_equipments.equipNum,
-                                  place=new_equipments.place)
-        return res
+        for item in new_equipments:
+            res = crud.add_equipments(db, equipName=item.equipName, equipNum=item.equipNum,
+                                      place=item.place)
+            return res
     else:
         return "权限不足"
 
 
 @app.post("/material/del")
-async def del_material(del_id: int, db: Session = Depends(get_db),
+async def del_material(del_id: schemas.delBae, db: Session = Depends(get_db),
                        current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
-        res = crud.del_material(db, del_id)
+        res = crud.del_material(db, del_id.del_id)
         return "删除" + str(res) + "条成功"
     else:
         return "权限不足"
@@ -165,8 +165,8 @@ async def del_material(del_id: int, db: Session = Depends(get_db),
 @app.post("/equipments/del")
 async def del_equipments(del_id: int, db: Session = Depends(get_db),
                          current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
         res = crud.del_equipments(db, del_id)
         return "删除" + str(res) + "条成功"
@@ -189,8 +189,8 @@ async def read_equipments(db: Session = Depends(get_db)):
 @app.post("/material/update")
 async def update_material(new_material: schemas.MaterialBase, db: Session = Depends(get_db),
                           current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
         res = crud.update_material(db, material_id=new_material.id, material_name=new_material.material_name,
                                    material_lot=new_material.material_lot, material_EOV=new_material.material_EOV)
@@ -200,10 +200,10 @@ async def update_material(new_material: schemas.MaterialBase, db: Session = Depe
 
 
 @app.post("/equipments/update")
-async def update_material(new_equipments: schemas.EquipmentsBase, db: Session = Depends(get_db),
-                          current_user: schemas.UserBase = Depends(get_current_user)):
-    logger.debug('用户名为' + str(current_user.user_name))
-    logger.debug('用户权限为' + str(current_user.authority))
+async def update_equipments(new_equipments: schemas.EquipmentsBase, db: Session = Depends(get_db),
+                            current_user: schemas.UserBase = Depends(get_current_user)):
+    logger.info('用户名为' + str(current_user.user_name))
+    logger.info('用户权限为' + str(current_user.authority))
     if current_user.authority >= 2:
         res = crud.update_equipments(db, equipments_id=new_equipments.id, equipName=new_equipments.equipName,
                                      equipNum=new_equipments.equipNum, place=new_equipments.place)
